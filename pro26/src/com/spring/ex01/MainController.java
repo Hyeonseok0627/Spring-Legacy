@@ -12,12 +12,15 @@ import org.springframework.web.servlet.ModelAndView;
 //클래스 범위
 @RequestMapping("/test")
 public class MainController {
-	// 메서드 범위
+//	메서드 범위
    @RequestMapping(value="/main1.do" ,method=RequestMethod.GET)
-   //main1 메서드
+   // main1 메서드 
    public ModelAndView main1(HttpServletRequest request, HttpServletResponse response)  throws Exception{
+	   
       ModelAndView mav=new ModelAndView();
+      // 결과 뷰에 전달하는 데이터 설정
       mav.addObject("msg","main1");
+      // 클라이언트에게 전달하는 결과 뷰.
       mav.setViewName("main");
       return mav;
    }

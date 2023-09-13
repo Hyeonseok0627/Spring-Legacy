@@ -3,7 +3,8 @@
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	id="WebApp_ID" version="3.0">
- 	 
+
+
    <listener>
       <listener-class>
          org.springframework.web.context.ContextLoaderListener
@@ -16,6 +17,7 @@
       </param-value>
    </context-param>  
 
+<!-- 한글 깨짐 방지 해주는 필터 (추가기능 설정.) -->
 	<filter>
 		<filter-name>encodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>

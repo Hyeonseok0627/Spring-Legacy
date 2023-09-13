@@ -11,13 +11,17 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
 http://www.springframework.org/schema/context
 http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
+<!-- 뷰의 폴더 경로, 확장명, 공통 부분 분리(재사용) -->
    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
       <property name="prefix" value="/WEB-INF/views/test/" />
     <!--   <property name="prefix" value="/WEB-INF/views/member/" /> -->
       <property name="suffix" value=".jsp"/>
    </bean>
-
+<!-- 애너테이션의 범위를 클래스, 메서드 범위로 지정
+    클래스   메서드   범위이다. 
+예) /test/login.do  -->
    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
   <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/>
+  <!-- 애너테이션의 적용 범위를 지정하는 경로 설정 -->
    <context:component-scan base-package="com.spring.ex02"/>
 </beans>
