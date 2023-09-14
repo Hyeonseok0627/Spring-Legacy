@@ -109,23 +109,24 @@ public class LoginController {
 		return mav;
 	}
 	
-	/*@RequestMapping(value = "/test/login4.do", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(value = "/test/login4.do", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView login4(@ModelAttribute("info") LoginVO loginVO,
 			                   HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("utf-8");
 		ModelAndView mav = new ModelAndView();
-		System.out.println("userID: "+loginVO.getUserID());
-		System.out.println("userName: "+loginVO.getUserName());
+		System.out.println("/test/login4.do -> userID: "+loginVO.getUserID());
+		System.out.println("/test/login4.do -> userName: "+loginVO.getUserName());
+		System.out.println("/test/login4.do -> email: "+loginVO.getEmail());
 		mav.setViewName("result");
 		return mav;
-	}*/
+	}
 	   
 	@RequestMapping(value = "/test/login5.do", method = { RequestMethod.GET, RequestMethod.POST })
 	public String login5(Model model,
 			                   HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("utf-8");
-		model.addAttribute("userID", "hong");
-		model.addAttribute("userName", "ȫ�浿");
+		model.addAttribute("userID", "lhs"); //이건 db에서 데이터가져오는게 아니라 직접 가져오는 데이터를 lhs로 지정
+		model.addAttribute("userName", "이현석");
 		return "result";
 	}	
 }
