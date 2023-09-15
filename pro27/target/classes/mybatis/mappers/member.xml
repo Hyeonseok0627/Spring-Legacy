@@ -2,8 +2,11 @@
 <!DOCTYPE mapper
       PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- pro24 재사용함. -->
 <!-- 동네 4번 , 코드와  sql 문장을 분리해서, 가독성 좋고, 복잡도 줄이고, 분업화, 
 유지보수도 좋다.  -->
+
 <mapper namespace="mapper.member">
 	<resultMap id="memResult" type="memberVO">
 		<result property="id" column="id" />
@@ -169,4 +172,12 @@
          name like '%' || #{name} || '%'		
       ]]>
     </select>
+    <!-- 기존 꺼 덮어쓰기 되어서, 다시 가지고 옴.  -->
+     <select id="loginById"  resultType="memberVO"   parameterType="memberVO" >
+	<![CDATA[
+		select * from t_member	
+		where id=#{id} and pwd=#{pwd}		
+	]]>
+  </select>
+    
 </mapper>

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Aspect
+// 보조 기능의 설정, -> 결론, 이 보조 기능을 , 어느 주기능에서 동작 여부를 정할것이냐, 
+
 public class LoggingAdvice {
 	private static final Logger logger = LoggerFactory.getLogger(LoggingAdvice.class);
 
@@ -24,8 +26,8 @@ public class LoggingAdvice {
 			+ "execution(* com.myspring.pro27.*.dao.*.*(..))")
 	public void startLog(JoinPoint jp) {
 
-		logger.info("-------------startLog------@Before------------------");
-		logger.info("-------------startLog------@Before------------------");
+		logger.info("-----------startLog------@Before-------------------");
+		logger.info("-----------startLog------@Before-------------------");
 
 		// 전달되는 모든 파라미터들을 Object의 배열로 가져옵니다. 
 		logger.info("1:" + Arrays.toString(jp.getArgs()));
@@ -49,8 +51,8 @@ public class LoggingAdvice {
 	@After("execution(* com.myspring.pro27.*.service.*.*(..)) or "
 			+ "execution(* com.myspring.pro27.*.dao.*.*(..))")
 	public void after(JoinPoint jp) { 
-		logger.info("-------------afterLog------@After------------------");
-		logger.info("-------------afterLog------@After------------------");
+		logger.info("--------------after-----@After-----------------");
+		logger.info("--------------after-----@After-----------------");
 
 		// 전달되는 모든 파라미터들을 Object의 배열로 가져옵니다. 
 		logger.info("1:" + Arrays.toString(jp.getArgs()));
@@ -76,17 +78,17 @@ public class LoggingAdvice {
 	@Around("execution(* com.myspring.pro27.*.service.*.*(..)) or "
 			+ "execution(* com.myspring.pro27.*.dao.*.*(..))")
 	public Object timeLog(ProceedingJoinPoint pjp) throws Throwable {
-		logger.info("===========@Around=====시작==============");
+		logger.info("============@Around====시작==============");
 		long startTime = System.currentTimeMillis();
 		logger.info(Arrays.toString(pjp.getArgs()));
-
+	
 		// 실제 타겟을 실행하는 부분이다. 이 부분이 없으면 advice가 적용된 메소드가 동작하지않습니다.
 		Object result = pjp.proceed(); // proceed는 Exception 보다 상위 Throwable을 처리해야 합니다.
 
 		long endTime = System.currentTimeMillis();
 		// target 메소드의 동작 시간을 출력한다.
 		logger.info(pjp.getSignature().getName() + " : " + (endTime - startTime)); 
-		logger.info("===========@Around=====종료===============");
+		logger.info("============@Around====종료==============");
 
 		// Around를 사용할 경우 반드시 Object를 리턴해야 합니다.
 		return result;

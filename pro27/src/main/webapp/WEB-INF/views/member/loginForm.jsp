@@ -3,7 +3,9 @@
     isELIgnored="false" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!-- 서버의 경로를 간단히 사용하기 위해서 -->
 <c:set var="contextPath"  value="${pageContext.request.contextPath}"  />
+<!-- result 상태 변수로, 로그인 여부를 확인하기 위해서 -->
 <c:set var="result" value="${param.result }" />
 <%
    request.setCharacterEncoding("UTF-8");

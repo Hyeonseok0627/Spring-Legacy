@@ -4,12 +4,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
+// 
 public class ViewNameInterceptor extends HandlerInterceptorAdapter {
 	@Override
+	// 컨트롤러 도달하기 전에 실행되는 메서드 : preHandle
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		try {
+			// 미리 뷰 이름 가져오는 부분
 			String viewName = getViewName(request);
+			// request 인스턴스에 담기. 
 			request.setAttribute("viewName", viewName);
 		} catch (Exception e) {
 			e.printStackTrace();

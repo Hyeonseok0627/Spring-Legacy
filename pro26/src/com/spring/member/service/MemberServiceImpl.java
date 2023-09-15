@@ -24,7 +24,7 @@ public class MemberServiceImpl implements MemberService {
 		return membersList;
 	}
 
-	// 한 회원의 정보 가져오기 추가 부분. 
+	  // 한 회원의 정보 가져오기 추가 부분. 
 	   @Override
 		public MemberVO getOneMember(String id) throws DataAccessException {
 		   MemberVO membervo = null;
@@ -47,4 +47,6 @@ public class MemberServiceImpl implements MemberService {
 	public int removeMember(String id) throws DataAccessException {
 		return memberDAO.deleteMember(id);
 	}
+	
+	
 }

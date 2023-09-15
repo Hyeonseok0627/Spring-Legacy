@@ -26,9 +26,9 @@ public class MemberControllerImpl   implements MemberController {
 	@Autowired
 	MemberVO memberVO ;
 	
+	@Override
 	@RequestMapping(value="/member/listMembers.do" ,method = RequestMethod.GET)
 	public ModelAndView listMembers(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 				String viewName = getViewName(request);
 				//실제 작업, 외주 맡김. 동네 2번으로 보내기. 
 				List membersList = memberService.listMembers();
@@ -44,25 +44,33 @@ public class MemberControllerImpl   implements MemberController {
 
 	@Override
 	@RequestMapping(value="/member/addMember.do" ,method = RequestMethod.POST)
-	public ModelAndView addMember(@ModelAttribute("member") MemberVO member,HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+	public ModelAndView addMember(@ModelAttribute("member") MemberVO member, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		request.setCharacterEncoding("utf-8");
 		int result = 0;
+		System.out.println("뷰로부터 데이터 확인 : member.getId() "+member.getId());
 		result = memberService.addMember(member);
 		ModelAndView mav = new ModelAndView("redirect:/member/listMembers.do");
 		return mav;
+		
 	}
 	
 	@Override
 	@RequestMapping(value="/member/removeMember.do" ,method = RequestMethod.GET)
-	public ModelAndView removeMember(@RequestParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ModelAndView removeMember(@RequestParam("id") String id, 
+			           HttpServletRequest request, HttpServletResponse response) throws Exception{
 
 		request.setCharacterEncoding("utf-8");
-//		String id=request.getParameter("id");
 		memberService.removeMember(id);
 		ModelAndView mav = new ModelAndView("redirect:/member/listMembers.do");
 		return mav;
 	}
+	
+	//동일, -> 수정폼 이름이 다름. 
+	// 재사용 안함, 이유? 폼은 단순 폼만 불러오면 상관이 없는데. 
+	// 수정하는 폼은 기존의 회원의 정보를 가져오는 로직이 추가로 필요함
+	// 여기에 추가 할려면, 구조를 변경해야함, 분기를 사용해야함. 
+	// 기존에 정규식 *Form 끝나는 부분을 받는 로직이 존재 재사용 방법2-> 기존 뷰 이름 변경.
 	
 	/*@RequestMapping(value = { "/member/loginForm.do", "/member/memberForm.do" }, method =  RequestMethod.GET)*/
 	@RequestMapping(value = "/member/*Form.do", method =  RequestMethod.GET)
@@ -74,15 +82,7 @@ public class MemberControllerImpl   implements MemberController {
 	}
 	
 	
-	
-	
-
-	//2번 기존에 정규식 *Form 끝나는 부분을 받는 로직이 존재 재사용 방법 -> 기존 뷰 이름 변경(재사용 안하겠다, 이유? 폼은 단순 폼만 불러오면 상관이 없는데, 
-	//수정하는 폼은 기존의 회원의 정보를 가져오는 로직이 추가로 필요함
-	//여기에 추가 할려면, 구조를 변경해야함(즉, 까다로움)
-	
-	
-
+// 동일
 	private String getViewName(HttpServletRequest request) throws Exception {
 		String contextPath = request.getContextPath();
 		String uri = (String) request.getAttribute("javax.servlet.include.request_uri");
@@ -114,10 +114,13 @@ public class MemberControllerImpl   implements MemberController {
 		return viewName;
 	}
 
-	//1번 원래대로, 해당 매핑 주소를 추가해서, 해당 폼으로 가게 하는 방법 -> 추가
+	// pro26 맞게끔 교체 작업. 다음 시간. 
+	// 애너테이션 기법으로 교체 작업
+	// 현재 pro26, requestMapping으로 교체되어서, *Form 방식으로 변경할 예정.
+//	원래대로, 해당 매핑 주소를 추가해서, 해당 폼으로 가게 하는 방법1-> 추가
 	@Override
-	@RequestMapping(value = "/member/modMember.do", method = RequestMethod.GET)
-	public ModelAndView modMember(@RequestParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	@RequestMapping(value = "/member/modMember.do", method =  RequestMethod.GET)
+	public ModelAndView modMember(@RequestParam("id") String id,HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// 수정하는 폼에서, id를 get 방식으로 전송해서, 서버측에 받을 수 있음. 
 				// id를 가져오는 구조는, 삭제에서 복붙. 재사용.
 //				String id=request.getParameter("id");
@@ -149,6 +152,7 @@ public class MemberControllerImpl   implements MemberController {
 				return mav;
 	}
 
+	//애너테이션 기법으로 교체 작업
 	@Override
 	@RequestMapping(value = "/member/updateMember.do", method =  RequestMethod.POST)
 	public ModelAndView updateMember(@ModelAttribute("memberVO") MemberVO memberVO, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -162,7 +166,6 @@ public class MemberControllerImpl   implements MemberController {
 		ModelAndView mav = new ModelAndView("redirect:/member/listMembers.do");
 		return mav;
 	}
-
 
 
 }

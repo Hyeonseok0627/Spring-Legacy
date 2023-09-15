@@ -21,23 +21,24 @@ public class MemberDAOImpl implements MemberDAO {
 		return membersList;
 	}
 
+	
 	// 하나의 정보를 조회 할 때 필요한 메서드 : selectOne, 시스템 메서드 
-	// 조건, 첫번째 인자: member.xml 의 sql 문장의 식별 아이디 
-	// 두번째 인자: 디비에 넘길 조건 파라미터(문자열), 한 회원의 아이디를 전달. 
-	// where id = "여기에 사용될 예정"
-	@Override
-	public MemberVO selectOneMember(String id) throws DataAccessException {
-		 MemberVO membervo = null;
-		 membervo = (MemberVO) sqlSession.selectOne("mapper.member.selectMemberById", id);
-		return membervo;
-	}
+		// 조건, 첫번째 인자: member.xml 의 sql 문장의 식별 아이디 
+		// 두번째 인자: 디비에 넘길 조건 파라미터(문자열), 한 회원의 아이디를 전달. 
+		// where id = "여기에 사용될 예정"
+		@Override
+		public MemberVO selectOneMember(String id) throws DataAccessException {
+			 MemberVO membervo = null;
+			 membervo = (MemberVO) sqlSession.selectOne("mapper.member.selectMemberById", id);
+			return membervo;
+		}
 
-	// 수정 적용하기.
-	@Override
-	public int updateMember(MemberVO memberVO) throws DataAccessException {
-		int result = sqlSession.update("mapper.member.updateMember", memberVO);
-		return result;
-	}
+		// 수정 적용하기.
+		@Override
+		public int updateMember(MemberVO memberVO) throws DataAccessException {
+			int result = sqlSession.update("mapper.member.updateMember", memberVO);
+			return result;
+		}
 	
 	@Override
 	public int insertMember(MemberVO memberVO) throws DataAccessException {

@@ -96,15 +96,16 @@ public class LoginController {
 			                   HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("utf-8");
 		ModelAndView mav = new ModelAndView();
-		
+		// 클라이언트로 부터 데이터 받아서 
 		String userID = info.get("userID");
 		String userName = info.get("userName");
 		String userEmail = info.get("email");
 		System.out.println("userID: "+userID);
 		System.out.println("userName: "+userName);
 		System.out.println("userEmail: "+userEmail);
-		
+		// 결과 뷰에 데이터 전달
 		mav.addObject("info", info);
+		// 결과 뷰를 전달.
 		mav.setViewName("result");
 		return mav;
 	}
@@ -118,15 +119,22 @@ public class LoginController {
 		System.out.println("/test/login4.do -> userName: "+loginVO.getUserName());
 		System.out.println("/test/login4.do -> email: "+loginVO.getEmail());
 		mav.setViewName("result");
+		// 모델엔뷰의 인스턴스에 설정된 뷰와 데이터를 이용해서, 결과 뷰에 전달이된다. 
 		return mav;
 	}
 	   
 	@RequestMapping(value = "/test/login5.do", method = { RequestMethod.GET, RequestMethod.POST })
+	// 메서드의 반환 타입이 모델엔뷰가 아니라, 단순 문자열로 되어 있고,
+	// 매개변수는 모델이라는 클래스를 이용중.
+	// 서버에서 임의로 설정한 데이터를 , 결과 뷰에 전달함.
 	public String login5(Model model,
 			                   HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("utf-8");
-		model.addAttribute("userID", "lhs"); //이건 db에서 데이터가져오는게 아니라 직접 가져오는 데이터를 lhs로 지정
-		model.addAttribute("userName", "이현석");
+		// 클라이언트의 뷰를 받아서 작업도 가능한데, 일단, 임의로 서버에서 
+		// 설정한 더미 데이터 테스트 하고 있음. 
+		model.addAttribute("userID", "lsy");
+		model.addAttribute("userName", "이상용");
+		// 뷰 리졸버에 등록이된 , 결과뷰 임. 
 		return "result";
 	}	
 }

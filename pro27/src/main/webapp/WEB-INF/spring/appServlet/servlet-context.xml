@@ -17,21 +17,24 @@
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
 		up static resources in the ${webappRoot}/resources directory -->
+		<!-- 정적 자원: 이미지, .js , css 시스템에 등록된 자원을 쉽게 접근 하기 위해서 설정.  -->
 	<resources mapping="/resources/**" location="/resources/" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
 		in the /WEB-INF/views directory -->
 	
-	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
+	<!-- 기존, 뷰 리졸버를 이용해서 결과뷰를 클라이언트에게 전달했고, -> 타일즈로 변경하니, 잠시 주석 -->
+<!-- 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
 		<beans:property name="prefix" value="/WEB-INF/views/" /> 
 		<beans:property name="suffix" value=".jsp" /> 
-	</beans:bean>
-  <!-- <context:component-scan	base-package="com.myspring.pro27.member" /> -->
-  <!-- 처음에는 member까지 했지만, log4j관련 LoggingAdvice.java 설정 범위가 pro27까지라 범위가 맞지않으므로 pro27까지로 수정해야함 -->
-    <context:component-scan	base-package="com.myspring.pro27" />
+	</beans:bean> -->
+	<!-- 여기서 구간을 base-package="com.myspring.pro27.member" -> 로그 확인안되어서 
+	변경하기 -->
+	
+  <context:component-scan	base-package="com.myspring.pro27" />
 
 <!-- 타일즈 실습 설정 -->
- <!-- 
+ 
  
     <beans:bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
 		<beans:property name="definitions">
@@ -46,15 +49,17 @@
 		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
 		<beans:property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView" />
 	</beans:bean>
--->
+
 <!-- 인터셉터 실습 설정 -->
-<!--     
-    
+  
+    <!-- 인터셉터가 적용이되는 범위는, pro27 전체 패키지이고
+    인터셉터가 동작하는 구체적인 클래스
+    com.myspring.pro27.member.interceptor.ViewNameInterceptor --> 
    <mvc:interceptors>
     	<mvc:interceptor>
 	      <mvc:mapping path="/*/*.do"/>
 	   <beans:bean class="com.myspring.pro27.member.interceptor.ViewNameInterceptor" />
 	</mvc:interceptor>
 </mvc:interceptors>
- -->
+  
 </beans:beans>
