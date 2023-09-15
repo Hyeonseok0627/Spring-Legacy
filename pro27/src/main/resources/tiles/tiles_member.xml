@@ -3,40 +3,85 @@
 "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
 "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
 <tiles-definitions>
-   <definition name="baseLayout"  template="/WEB-INF/views/common/layout.jsp">
+<!-- 부모, 공통 레이아웃 설정 -> 헤더, 사이드, 푸터, 3가지를 베이스 레잉아웃 설정했음 -->
+	<!-- <기존 내용> -->
+<!--    <definition name="baseLayout"  template="/WEB-INF/views/common/layout.jsp">
       <put-attribute name="title" value="" />
       <put-attribute name="header" value="/WEB-INF/views/common/header.jsp" />
       <put-attribute name="side" value="/WEB-INF/views/common/side.jsp" />
       <put-attribute name="body" value="" />
       <put-attribute name="footer" value="/WEB-INF/views/common/footer.jsp" />
+   </definition> -->
+   
+   <!-- <실습과제 0915> -->
+      <definition name="baseLayout"  template="/WEB-INF/views/comm_lhs0915/layout.jsp">
+      <put-attribute name="title" value="" />
+      <put-attribute name="header" value="/WEB-INF/views/comm_lhs0915/header.jsp" />
+      <put-attribute name="side" value="/WEB-INF/views/comm_lhs0915/side.jsp" />
+      <put-attribute name="body" value="" />
+      <put-attribute name="footer" value="/WEB-INF/views/comm_lhs0915/footer.jsp" />
    </definition>
 
    <definition name="main" extends="baseLayout">
       <put-attribute name="title" value="메인페이지" />
       <put-attribute name="body" value="/WEB-INF/views/main.jsp" />
    </definition>
+   
+   
 
-
-   <definition name="/member/listMembers" extends="baseLayout">
+	<!-- <기존 내용> -->
+<!--    <definition name="/member/listMembers" extends="baseLayout">
       <put-attribute name="title" value="회원목록창" />
       <put-attribute name="body" value="/WEB-INF/views/member/listMembers.jsp" />
+   </definition> -->
+   
+   <!-- <실습과제 0915> -->
+   <definition name="/memb_lhs0915/listMembers" extends="baseLayout">
+      <put-attribute name="title" value="회원목록창" />
+      <put-attribute name="body" value="/WEB-INF/views/memb_lhs0915/listMembers.jsp" />
    </definition>
    
 
-    
-   <definition name="/member/loginForm" extends="baseLayout">
+    <!-- <기존 내용> -->
+<!--    <definition name="/member/loginForm" extends="baseLayout">
       <put-attribute name="title" value="로그인창" />
       <put-attribute name="body" value="/WEB-INF/views/member/loginForm.jsp" />
+   </definition> -->
+   
+   
+   <!-- <실습과제 0915> -->
+  <definition name="/memb_lhs0915/loginForm" extends="baseLayout">
+      <put-attribute name="title" value="로그인창" />
+      <put-attribute name="body" value="/WEB-INF/views/memb_lhs0915/loginForm.jsp" />
    </definition>
       
-<!-- 
-   <definition name="/member/memberForm" extends="baseLayout">
+   <!-- <실습과제 0915> -->
+   <definition name="/memb_lhs0915/modMember" extends="baseLayout">
+      <put-attribute name="title" value="수정하기" />
+      <put-attribute name="body" value="/WEB-INF/views/memb_lhs0915/modMember.jsp" />
+   </definition>
+      
+  <!-- <기존 내용> -->
+<!--     <definition name="/member/memberForm" extends="baseLayout">
       <put-attribute name="title" value="회원등록창" />
       <put-attribute name="body" value="/WEB-INF/views/member/memberForm.jsp" />
    </definition>
+
 
    <definition name="/member/viewDetail" extends="baseLayout">
       <put-attribute name="title" value="회원상세창" />
       <put-attribute name="body" value="/WEB-INF/views/member/viewDetail.jsp" />
    </definition> -->
+   
+   <!-- <실습과제 0915> -->
+       <definition name="/memb_lhs0915/memberForm" extends="baseLayout">
+      <put-attribute name="title" value="회원등록창" />
+      <put-attribute name="body" value="/WEB-INF/views/memb_lhs0915/memberForm.jsp" />
+   </definition>
+
+   <definition name="/memb_lhs0915/viewDetail" extends="baseLayout">
+      <put-attribute name="title" value="회원상세창" />
+      <put-attribute name="body" value="/WEB-INF/views/memb_lhs0915/viewDetail.jsp" />
+   </definition> 
+   
 </tiles-definitions>
