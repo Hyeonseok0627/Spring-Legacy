@@ -35,12 +35,16 @@ import com.myspring.pro30.member.vo.MemberVO;
 
 @Controller("boardController")
 public class BoardControllerImpl  implements BoardController{
+	// 시스템이 제공하는 이미지가 있고, 해당 프로젝트 내부에 정적인 이미지 폴더 제공
+	// 유저가 게시글에 대한 이미지를 올릴 수도 있음. 미디어 저장소, 외부 서버를 사용(AWS, 외부서버 등)
+	// -> 임시로 내부 C 드라이브를 미디어 저장소 사용할 뿐..
 	private static final String ARTICLE_IMAGE_REPO = "C:\\board\\article_image";
 	@Autowired
 	BoardService boardService;
 	@Autowired
 	ArticleVO articleVO;
 	
+	// 게시글 전체 목록보기.
 	@Override
 	@RequestMapping(value= "/board/listArticles.do", method = {RequestMethod.GET, RequestMethod.POST})
 	public ModelAndView listArticles(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -52,53 +56,109 @@ public class BoardControllerImpl  implements BoardController{
 		
 	}
 	
-	 //�� �� �̹��� �۾���
+	 // 글쓰기, 단일 이미지 업로드
 	@Override
 	@RequestMapping(value="/board/addNewArticle.do" ,method = RequestMethod.POST)
+	// 전체 구조 : @Controller. 이미지+뷰, 같이 전달하지만,
+	// 혼합 구성이 가능.
+	// 데이터만 전달.(@ResponseBody가 있을 시, @Controller이라고 해도 뷰 말고 데이터만 전달할 수 있게 가능하도록 함)
+	// 서버 -> 클라이언트 : 데이터 전달, 중간에 잭슨 라이브러리가 객체를 -> JSON 형태로 전달.
 	@ResponseBody
+	// ResponseEntity -> 데이터만 전달하면, 상태를 모름
+	// 그래서 상태(HTTP Status code)를 같이 전달
 	public ResponseEntity addNewArticle(MultipartHttpServletRequest multipartRequest, 
 	HttpServletResponse response) throws Exception {
+		// 클라이언트가 게시글 작성 후, 서버로 전달하면,
+		// 서버에서, 데이터를 2가지 처리
+		// 1) 일반 데이터, 2) 파일 데이터(이미지, 동영상 등)
+		// MultipartHttpServletRequest -> 일반+파일 데이터를 같이 처리 시 주로 사용함.
+		// 보통 일반 데이터만 하면 HttpServletRequest 이것 사용
 		multipartRequest.setCharacterEncoding("utf-8");
+		// 클라이언트로부터 전달 받은 정보를 맵(컬랙션)에 담아서
+		// 각각의 동네에 전달하는 과정 -> 동네1~동네4
+		// 컨트롤러 -> 서비스 -> DAO -> mapper -> 실제 DB : 정방향
+		// 동네 1~4 다 순회 후, 각각 실제 DB에 저장하거나,
+		// 조회 시, 조회된 DB를 가지고 온다.
+		// 박스 : articleMap,  내용 : 일반데이터+파일데이터가 들어있음
 		Map<String,Object> articleMap = new HashMap<String, Object>();
+		// Object는 최상위 객체 타입이라 넣을때는 모든 유형을 다 이걸로 넣을 순 있지만,
+		// 꺼낼때는 꺼내서 사용할 때의 해당 타입으로 다운캐스팅해서 꺼내줘야함
+		// .getParameterNames() : 일반데이터를 가져오는 것에 사용
+		// 일반 데이터를 조회해서, 각 키에 대한 값을 분류
+		// 예) 작성자, 게시글, 등록일
 		Enumeration enu=multipartRequest.getParameterNames();
 		while(enu.hasMoreElements()){
+			// multipartRequest : 일반 데이터가 있다면
 			String name=(String)enu.nextElement();
 			String value=multipartRequest.getParameter(name);
+			// key : title, value : 게시글 제목으로 해서 articleMap에 담겨짐
 			articleMap.put(name,value);
 		}
-		
+		// uploda 메서드는 아래 정의가 되어 있고,
+		// 미디어 저장소에 파일형식으로 저장을 하고,
+		// 저장된 파일 이미지의 이름을 반환하는 형식
 		String imageFileName= upload(multipartRequest);
+		// 로그인 후, 세션에 로그인 된 정보를 등록
+		// 세션에 접근하기 위한 인스턴스
 		HttpSession session = multipartRequest.getSession();
+		// session, 임시 서버의 저장소에 로그인된 정보를 가지고 온다.
+		// memberVO , 로그인 된 회원의 정보
 		MemberVO memberVO = (MemberVO) session.getAttribute("member");
+		// 로그인한 회원의 아이디 조회
 		String id = memberVO.getId();
+		// articleMap에 부모글의 번호 기본으로 0으로 설정 
 		articleMap.put("parentNO", 0);
+		// id -> 로그인한 회원의 아이디
 		articleMap.put("id", id);
+		// 게시글의 첨부된 이미지 파일의 이름.
 		articleMap.put("imageFileName", imageFileName);
 		
+		// 데이터 전달 상태를 알려주는 역할로 메세지를 사용할 예정
 		String message;
+		// 데이터와 상태를 같이 전달하기 위한 ResponseEntity 사용.
 		ResponseEntity resEnt=null;
+		// ResponseEntity = 1) 데이터 + 2) 상태 + 3) 헤더(추가요소)
 		HttpHeaders responseHeaders = new HttpHeaders();
+		// 3) 헤더에 추가한 요소,
 		responseHeaders.add("Content-Type", "text/html; charset=utf-8");
 		try {
+			// 실제 데이터를 입력 시, 항상  try catch 구문 안에서 작업.
+			// 파일 IO, 언제든 오류가 발생할 가능성이 있어서, 비정상 종료 방지 하기 위해서
+			// try 안에서 작업을 함.
+			// 동네 1이, 동네 2번에 외주를 준다.
+			// 로그인 - 글쓰기 연결 확인 후
+			
+			// 일반 데이터 + 파일이미지 이름.
+			// 일반 데이터를 동네1 ~ 동네4 통해서, DB에 저장.
+			// articleMap : 구성요소, 1) 게시글 내용 2) 이미지 파일이름 3) parentNO :0
+			// 하나의 게시글 데이터 저장하는 메서드 안에 일반데이터, 파일데이터용으로 세부 메서드로 따로 나누어있음
 			int articleNO = boardService.addNewArticle(articleMap);
+			
+			// 실제 이미지 파일을 ->물리 저장소에 저장하는 로직
+			// 이미지 파일 첨부 했다. 즉, 널도 아니고, 길이가 0도 아니다.
 			if(imageFileName!=null && imageFileName.length()!=0) {
+				// 임시 파일 저장소
 				File srcFile = new 
 				File(ARTICLE_IMAGE_REPO+"\\"+"temp"+"\\"+imageFileName);
+				// 실제 파일 저장이 되는 저장소
 				File destDir = new File(ARTICLE_IMAGE_REPO+"\\"+articleNO);
+				// 임시 저장소 -> 실제 저장소 파일을 이동함.
 				FileUtils.moveFileToDirectory(srcFile, destDir,true);
 			}
-	
+	// 서버 -> 클라이언트에게 상태를 알려줌, 데이터가 잘 작성되었다고.
 			message = "<script>";
-			message += " alert('������ �߰��߽��ϴ�.');";
+			message += " alert('글쓰기 성공.');";
 			message += " location.href='"+multipartRequest.getContextPath()+"/board/listArticles.do'; ";
 			message +=" </script>";
 		    resEnt = new ResponseEntity(message, responseHeaders, HttpStatus.CREATED);
 		}catch(Exception e) {
+			// 오류가 발생 시,
+			// 임시 저장소를 삭제
 			File srcFile = new File(ARTICLE_IMAGE_REPO+"\\"+"temp"+"\\"+imageFileName);
 			srcFile.delete();
-			
+			// 메세지 보냄 ("글쓰기 작성 오류")
 			message = " <script>";
-			message +=" alert('������ �߻��߽��ϴ�. �ٽ� �õ��� �ּ���');');";
+			message +=" alert('글쓰기 작성 오류');');";
 			message +=" location.href='"+multipartRequest.getContextPath()+"/board/articleForm.do'; ";
 			message +=" </script>";
 			resEnt = new ResponseEntity(message, responseHeaders, HttpStatus.CREATED);
@@ -108,20 +168,31 @@ public class BoardControllerImpl  implements BoardController{
 	}
 	
 	
-	//�Ѱ��� �̹��� �����ֱ�
+	// 상세 페이지 조회, 단일 이미지 버전
 	@RequestMapping(value="/board/viewArticle.do" ,method = RequestMethod.GET)
+	// @RequestParam,
+	// 클라이언트로 전달 받은 매개변수를 서버에서 사용하는 방법
+	// 게시글 제목 클릭 시, 서버로 전달된 주소 예
+	// http://localhost:8080/pro30/board/viewArticle.do?articleNO=4
 	public ModelAndView viewArticle(@RequestParam("articleNO") int articleNO,
                                     HttpServletRequest request, HttpServletResponse response) throws Exception{
+		// 인터셉터를 이용해서, 서버의 컨트롤러에 도달하기전에, 해당 뷰의 이름을 가져와서
+		// request 인스턴스에 미리 담아두기.
 		String viewName = (String)request.getAttribute("viewName");
+		// 상세 페이지를 보기 위해서, articleNO=4 에 대한 정보를 조회하는 과정.
+		// 동네 1번에서 작업을 못하니, 동네 2번에 외주 -> 결과는 4번 게시글의 내용을 전달하는 로직.
 		articleVO=boardService.viewArticle(articleNO);
+		// 4번 게시글의 정보를 DB에서 조회하고 돌아왔음.
 		ModelAndView mav = new ModelAndView();
+		// 데이터와 뷰를 같이 전달하자.
 		mav.setViewName(viewName);
+		// 데이터를 결과 뷰에 전달.
 		mav.addObject("article", articleVO);
 		return mav;
 	}
 	
 	/*
-	//���� �̹��� �����ֱ�
+	//���� �̹��� �����ֱ�
 	@RequestMapping(value="/board/viewArticle.do" ,method = RequestMethod.GET)
 	public ModelAndView viewArticle(@RequestParam("articleNO") int articleNO,
 			  HttpServletRequest request, HttpServletResponse response) throws Exception{
@@ -136,13 +207,15 @@ public class BoardControllerImpl  implements BoardController{
 	
 
 	
-  //�� �� �̹��� ���� ���
+  // 단일 이미지 수정 적용하는 코드.
   @RequestMapping(value="/board/modArticle.do" ,method = RequestMethod.POST)
   @ResponseBody
   public ResponseEntity modArticle(MultipartHttpServletRequest multipartRequest,  
     HttpServletResponse response) throws Exception{
     multipartRequest.setCharacterEncoding("utf-8");
+    // articleMap : 임시 저장 박스(수정된 글, 이미지를 담는 박스)
 	Map<String,Object> articleMap = new HashMap<String, Object>();
+	// 일반 데이터 추출
 	Enumeration enu=multipartRequest.getParameterNames();
 	while(enu.hasMoreElements()){
 		String name=(String)enu.nextElement();
@@ -150,6 +223,7 @@ public class BoardControllerImpl  implements BoardController{
 		articleMap.put(name,value);
 	}
 	
+	// 수정된 이미지를 미디어 저장소에 저장 후, 파일 이름 가져오기
 	String imageFileName= upload(multipartRequest);
 	HttpSession session = multipartRequest.getSession();
 	MemberVO memberVO = (MemberVO) session.getAttribute("member");
@@ -158,23 +232,27 @@ public class BoardControllerImpl  implements BoardController{
 	articleMap.put("imageFileName", imageFileName);
 	
 	String articleNO=(String)articleMap.get("articleNO");
+	
 	String message;
 	ResponseEntity resEnt=null;
 	HttpHeaders responseHeaders = new HttpHeaders();
 	responseHeaders.add("Content-Type", "text/html; charset=utf-8");
     try {
+    	// 수정된 데이터를 DB에 반영하는 로직, 외주 주기.
        boardService.modArticle(articleMap);
+       // 실제 이미지를 업로드하는 로직.
        if(imageFileName!=null && imageFileName.length()!=0) {
          File srcFile = new File(ARTICLE_IMAGE_REPO+"\\"+"temp"+"\\"+imageFileName);
          File destDir = new File(ARTICLE_IMAGE_REPO+"\\"+articleNO);
          FileUtils.moveFileToDirectory(srcFile, destDir, true);
          
+         // 기존 이미지 삭제
          String originalFileName = (String)articleMap.get("originalFileName");
          File oldFile = new File(ARTICLE_IMAGE_REPO+"\\"+articleNO+"\\"+originalFileName);
          oldFile.delete();
        }	
        message = "<script>";
-	   message += " alert('���� �����߽��ϴ�.');";
+	   message += " alert('수정완료');";
 	   message += " location.href='"+multipartRequest.getContextPath()+"/board/viewArticle.do?articleNO="+articleNO+"';";
 	   message +=" </script>";
        resEnt = new ResponseEntity(message, responseHeaders, HttpStatus.CREATED);
@@ -182,7 +260,7 @@ public class BoardControllerImpl  implements BoardController{
       File srcFile = new File(ARTICLE_IMAGE_REPO+"\\"+"temp"+"\\"+imageFileName);
       srcFile.delete();
       message = "<script>";
-	  message += " alert('������ �߻��߽��ϴ�.�ٽ� �������ּ���');";
+	  message += " alert('수정오류');";
 	  message += " location.href='"+multipartRequest.getContextPath()+"/board/viewArticle.do?articleNO="+articleNO+"';";
 	  message +=" </script>";
       resEnt = new ResponseEntity(message, responseHeaders, HttpStatus.CREATED);
@@ -190,9 +268,11 @@ public class BoardControllerImpl  implements BoardController{
     return resEnt;
   }
   
+  // 삭제하기
   @Override
   @RequestMapping(value="/board/removeArticle.do" ,method = RequestMethod.POST)
   @ResponseBody
+  // 
   public ResponseEntity  removeArticle(@RequestParam("articleNO") int articleNO,
                               HttpServletRequest request, HttpServletResponse response) throws Exception{
 	response.setContentType("text/html; charset=UTF-8");
@@ -201,19 +281,21 @@ public class BoardControllerImpl  implements BoardController{
 	HttpHeaders responseHeaders = new HttpHeaders();
 	responseHeaders.add("Content-Type", "text/html; charset=utf-8");
 	try {
+		// 삭제 시, 일반 데이터 + 파일 이미지(데이터) 도 같이 삭제
 		boardService.removeArticle(articleNO);
+		// 미디어 서버, 저장소에 저장된 파일을 삭제
 		File destDir = new File(ARTICLE_IMAGE_REPO+"\\"+articleNO);
 		FileUtils.deleteDirectory(destDir);
 		
 		message = "<script>";
-		message += " alert('���� �����߽��ϴ�.');";
+		message += " alert('삭제 완료');";
 		message += " location.href='"+request.getContextPath()+"/board/listArticles.do';";
 		message +=" </script>";
 	    resEnt = new ResponseEntity(message, responseHeaders, HttpStatus.CREATED);
 	       
 	}catch(Exception e) {
 		message = "<script>";
-		message += " alert('�۾��� ������ �߻��߽��ϴ�.�ٽ� �õ��� �ּ���.');";
+		message += " alert('삭제 오류');";
 		message += " location.href='"+request.getContextPath()+"/board/listArticles.do';";
 		message +=" </script>";
 	    resEnt = new ResponseEntity(message, responseHeaders, HttpStatus.CREATED);
@@ -223,7 +305,7 @@ public class BoardControllerImpl  implements BoardController{
   }  
   
 /*
-  //���� �̹��� �� �߰��ϱ�
+  //���� �̹��� �� �߰��ϱ�
   @Override
   @RequestMapping(value="/board/addNewArticle.do" ,method = RequestMethod.POST)
   @ResponseBody
@@ -239,7 +321,7 @@ public class BoardControllerImpl  implements BoardController{
 		articleMap.put(name,value);
 	}
 	
-	//�α��� �� ���ǿ� ����� ȸ�� �������� �۾��� ���̵� ���ͼ� Map�� �����մϴ�.
+	//�α��� �� ���ǿ� ����� ȸ�� �������� �۾��� ���̵� ���ͼ� Map�� �����մϴ�.
 	HttpSession session = multipartRequest.getSession();
 	MemberVO memberVO = (MemberVO) session.getAttribute("member");
 	String id = memberVO.getId();
@@ -273,7 +355,7 @@ public class BoardControllerImpl  implements BoardController{
 		}
 		    
 		message = "<script>";
-		message += " alert('������ �߰��߽��ϴ�.');";
+		message += " alert('������ �߰��߽��ϴ�.');";
 		message += " location.href='"+multipartRequest.getContextPath()+"/board/listArticles.do'; ";
 		message +=" </script>";
 	    resEnt = new ResponseEntity(message, responseHeaders, HttpStatus.CREATED);
@@ -290,7 +372,7 @@ public class BoardControllerImpl  implements BoardController{
 
 		
 		message = " <script>";
-		message +=" alert('������ �߻��߽��ϴ�. �ٽ� �õ��� �ּ���');');";
+		message +=" alert('������ �߻��߽��ϴ�. �ٽ� �õ��� �ּ���');');";
 		message +=" location.href='"+multipartRequest.getContextPath()+"/board/articleForm.do'; ";
 		message +=" </script>";
 		resEnt = new ResponseEntity(message, responseHeaders, HttpStatus.CREATED);
@@ -302,7 +384,8 @@ public class BoardControllerImpl  implements BoardController{
 */
 
 	
-
+  	// /board/*Form.do -> 글쓰기 폼, 수정폼, 답글 폼
+  	// 뷰만 띄워주는 로직
 	@RequestMapping(value = "/board/*Form.do", method =  RequestMethod.GET)
 	private ModelAndView form(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String viewName = (String)request.getAttribute("viewName");
@@ -311,7 +394,7 @@ public class BoardControllerImpl  implements BoardController{
 		return mav;
 	}
 
-	//�Ѱ� �̹��� ���ε��ϱ�
+	//�Ѱ� �̹��� ���ε��ϱ�
 	private String upload(MultipartHttpServletRequest multipartRequest) throws Exception{
 		String imageFileName= null;
 		Iterator<String> fileNames = multipartRequest.getFileNames();
@@ -322,19 +405,19 @@ public class BoardControllerImpl  implements BoardController{
 			imageFileName=mFile.getOriginalFilename();
 			File file = new File(ARTICLE_IMAGE_REPO +"\\"+ fileName);
 			if(mFile.getSize()!=0){ //File Null Check
-				if(! file.exists()){ //��λ� ������ �������� ���� ���
-					if(file.getParentFile().mkdirs()){ //��ο� �ش��ϴ� ���丮���� ����
-							file.createNewFile(); //���� ���� ����
+				if(! file.exists()){ //��λ� ������ �������� ���� ���
+					if(file.getParentFile().mkdirs()){ //��ο� �ش��ϴ� ���丮���� ����
+							file.createNewFile(); //���� ���� ����
 					}
 				}
-				mFile.transferTo(new File(ARTICLE_IMAGE_REPO +"\\"+"temp"+ "\\"+imageFileName)); //�ӽ÷� ����� multipartFile�� ���� ���Ϸ� ����
+				mFile.transferTo(new File(ARTICLE_IMAGE_REPO +"\\"+"temp"+ "\\"+imageFileName)); //�ӽ÷� ����� multipartFile�� ���� ���Ϸ� ����
 			}
 		}
 		return imageFileName;
 	}
 	
 	/*
-	//���� �̹��� ���ε��ϱ�
+	//���� �̹��� ���ε��ϱ�
 	private List<String> upload(MultipartHttpServletRequest multipartRequest) throws Exception{
 		List<String> fileList= new ArrayList<String>();
 		Iterator<String> fileNames = multipartRequest.getFileNames();
@@ -345,12 +428,12 @@ public class BoardControllerImpl  implements BoardController{
 			fileList.add(originalFileName);
 			File file = new File(ARTICLE_IMAGE_REPO +"\\"+ fileName);
 			if(mFile.getSize()!=0){ //File Null Check
-				if(! file.exists()){ //��λ� ������ �������� ���� ���
-					if(file.getParentFile().mkdirs()){ //��ο� �ش��ϴ� ���丮���� ����
-							file.createNewFile(); //���� ���� ����
+				if(! file.exists()){ //��λ� ������ �������� ���� ���
+					if(file.getParentFile().mkdirs()){ //��ο� �ش��ϴ� ���丮���� ����
+							file.createNewFile(); //���� ���� ����
 					}
 				}
-				mFile.transferTo(new File(ARTICLE_IMAGE_REPO +"\\"+"temp"+ "\\"+originalFileName)); //�ӽ÷� ����� multipartFile�� ���� ���Ϸ� ����
+				mFile.transferTo(new File(ARTICLE_IMAGE_REPO +"\\"+"temp"+ "\\"+originalFileName)); //�ӽ÷� ����� multipartFile�� ���� ���Ϸ� ����
 			}
 		}
 		return fileList;
