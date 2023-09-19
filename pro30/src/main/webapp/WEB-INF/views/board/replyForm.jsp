@@ -4,6 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="contextPath"  value="${pageContext.request.contextPath}"  />
+
 <c:set var="passwordCheck2" value="${passwordCheck }"/>
 <%
   request.setCharacterEncoding("UTF-8");
@@ -29,8 +30,8 @@ function checkSubmit() {
 }
 
 function passwordConfirm(password){
-	alert("password 전달여부 확인 : " + password)
-	alert("${member.pwd} 전달여부 확인 : " + ${member.pwd})
+	/* alert("password 전달여부 확인 : " + password)
+	alert("${member.pwd} 전달여부 확인 : " + ${member.pwd}) */
 
 	if(password == ${member.pwd}){
 		checkPwd = 1
@@ -62,7 +63,8 @@ function passwordConfirm(password){
 
 <body>
  <h1>답글쓰기</h1>
-  <form name="frmReply" method="post"  action="${contextPath}/board/addReply.do?${parentNo}"   enctype="multipart/form-data">
+  <form name="frmReply" method="post"  action="${contextPath}/board/addReply.do"   enctype="multipart/form-data">
+  <%-- <form name="frmReply" method="post"  action="${contextPath}/board/addReply.do"   enctype="multipart/form-data"> --%>
     <table>
     <tr>
 			<td align="right"> 작성자:&nbsp; </td>
@@ -70,7 +72,8 @@ function passwordConfirm(password){
 		</tr>
 		<tr>
 			<td align="right">제목:&nbsp;  </td>
-			<td><input type="text" size="67"  maxlength="500" name="title"> </input></td>
+			<td><input type="text" size="67"  maxlength="500" name="title" > </input></td>
+			<td><input type="hidden" size="67"  maxlength="500" name="parentNO" value="${parentNO}" > </input></td>
 		</tr>
 		<tr>
 			<td align="right" valign="top"><br>내용:&nbsp; </td>
@@ -91,6 +94,7 @@ function passwordConfirm(password){
 			<td align="right"> </td>
 			<td>
 				<input id="submitBtn" type=submit value="답글쓰기" onClick="return checkSubmit()" />
+				<!-- <input type=submit value="답글쓰기" /> -->
 				<input type=button value="취소"onClick="backToList(this.form)" />
 				
 			</td>

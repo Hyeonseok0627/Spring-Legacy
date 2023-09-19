@@ -39,7 +39,16 @@
 		]]>      
 	</insert>
 	
-	<!-- 다음 게시글 번호를 생성해주는 DB -->
+	<!--단일이미지 답글추가  -->
+	 
+  <insert id="insertReplyNewArticle"  parameterType="java.util.Map">
+		<![CDATA[
+			INSERT into t_board(articleNO, parentNO, title, content, imageFileName, id)
+			VALUES(#{articleNO},#{parentNO}, #{title},	#{content}, #{imageFileName},	#{id})
+		]]>      
+	</insert>
+	
+	<!-- 다음 게시글 번호를 생성해주는 디비  -->
   <select id="selectNewArticleNO" resultType="int"  >
 		<![CDATA[
 			SELECT  max(articleNO)+1 from t_board		
@@ -65,7 +74,6 @@
 	
 	<delete id="deleteArticle"  parameterType="int">
     <![CDATA[
-    <!-- 부모글이 사라지면 답글인 자식글도 함께 사라지도록 하는 것 -->
       delete from t_board
       where articleNO in (
          SELECT articleNO FROM  t_board
