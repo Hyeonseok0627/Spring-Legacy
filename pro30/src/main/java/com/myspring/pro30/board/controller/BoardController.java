@@ -35,5 +35,7 @@ public interface BoardController {
 			@RequestParam("articleNO") int articleNO,
 			@RequestParam("imageFileName") String imageFileName,
             HttpServletRequest request, HttpServletResponse response) throws Exception;
+	// 이미지들만 추가하기. 
+	public ResponseEntity onlyImageUpload(@RequestParam("articleNO") int articleNO,MultipartHttpServletRequest multipartRequest,HttpServletResponse response) throws Exception;
 
 }

@@ -61,7 +61,7 @@ public class BoardServiceImpl  implements BoardService{
 	 //다중 이미지 이미지만 디비에 저장
 	// articleMap : 일반 데이터 + 여러 파일 이미지 이름 담아져 있다.
 @Override
-public void addOnlyImage(Map articleMap, int articleVO) throws Exception{
+public void addOnlyImage(Map articleMap) throws Exception{
 	// 새 게시글 번호를 가져오는 로직 
 	int articleNO = boardDAO.insertNewArticle(articleMap);
 	// 일반 데이터를 디비에 저장하고, 새 게시글 번호를 가져 왔음.
@@ -74,6 +74,13 @@ public void addOnlyImage(Map articleMap, int articleVO) throws Exception{
 	
 }
 
+// 이미지만 업로드, 기존 게시글에서 추가하는 부분.
+@Override
+public void addOnlyImage2(Map articleMap, int articleNO) throws Exception{
+	articleMap.put("articleNO", articleNO);
+	boardDAO.insertNewImage(articleMap);
+	
+}
 	
 	//다중 이미지 상세보기
 	@Override

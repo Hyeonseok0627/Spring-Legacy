@@ -17,6 +17,39 @@
 
 var checkPwd = 0 
 
+/* cnt , 파일 추가시 , 입력태그 구분 짓는 변수 */
+var cnt=1;
+/* cnt1 , 이미지 불러오는 태그를 구분 짓는 변수 */
+var cnt1=0; 
+/* cnt2 img 태그를 구분짓는 변수 */
+var cnt2=0;
+
+function readURL2(input) {
+	  console.log('readURL2 호출 여부 확인')
+  if (input.files && input.files[0]) {
+	      var reader = new FileReader();
+	     
+	      reader.onload = function (e) {
+	    	  console.log('preview 호출 전 cnt2 : '+ cnt2)
+	        $('#preview'+cnt1).attr('src', e.target.result);
+	    	  cnt1++;
+	    	  console.log('preview 호출 후 cnt2 : '+ cnt2)
+      }
+     reader.readAsDataURL(input.files[0]);
+  }
+} 
+
+/* 추가2 */
+function fn_addFile(){
+	  $("#d_file").append("<br>"+"<input type='file' name='file"+cnt+"+"+"' onchange="+"readURL2(this); />");
+	  
+	  cnt++;
+	   $("#previews").append("<br>"+"<img id='preview"+cnt2+"' src='#'"+ "width=200 height=200 />");
+	  /* <td> <input type="file" name="imageFileName"  onchange="readURL(this);" /></td>
+	  <td><img  id="preview" src="#"   width=200 height=200/></td> */
+	   cnt2++;
+	  console.log(cnt2);
+}  
 
 function checkSubmit() {
 	if(checkPwd ==1) {
@@ -48,15 +81,7 @@ function passwordConfirm(password){
  }
  
  
-  function readURL(input) {
-      if (input.files && input.files[0]) {
-          var reader = new FileReader();
-          reader.onload = function (e) {
-              $('#preview').attr('src', e.target.result);
-          }
-          reader.readAsDataURL(input.files[0]);
-      }
-  }  
+ 
 </script> 
 <title>답글쓰기 페이지</title>
 </head>
@@ -87,11 +112,21 @@ function passwordConfirm(password){
 			<td><input type=button value="패스워드확인"onClick="passwordConfirm(inputPassword.value)" /></td>
 			
 		</tr>
-		<tr>
-			<td align="right">이미지파일 첨부:  </td>
-			<td> <input type="file" name="imageFileName"  onchange="readURL(this);" /></td>
-            <td><img  id="preview" src="#"   width=200 height=200/></td>
-		</tr>
+		 <tr>
+			  <td align="right">이미지파일 첨부:  </td>
+			  <!-- 추가3 -->
+			  <td align="left"> <input type="button" value="파일 추가" onClick="fn_addFile()"/></td>
+			  <!-- <td> <input type="file" name="imageFileName"  onchange="readURL(this);" /></td> -->
+			  <!-- <td><img  id="preview" src="#"   width=200 height=200/></td> -->
+			  
+	   </tr>
+	     <tr>
+	   <!-- 여기에 파일이 추가 되는 태그가 첨부되는 자리 -->
+	      <td colspan="4"><div id="d_file"></div></td>
+	      <!-- 추가4 -->
+	      <!-- 첨부된 이미지를 불러오는 영역 -->
+	       <td colspan="4"><div id="previews"></div></td>
+	   </tr>
 		<tr>
 			<td align="right"> </td>
 			<td>

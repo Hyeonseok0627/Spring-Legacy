@@ -61,6 +61,8 @@
    지금 inner HTML이라고 해서, 동적으로 개발작, 폼 요소, 속성, 임의로 만들어서 
    html 문서에 주입을 하는 형식. */
 	 function fn_remove_article(url,articleNO){
+		  var shouldDelete = confirm("정말 삭제 할까요?");
+		  if (shouldDelete){
 	   /* 동적으로 form 태그를 만들기 */
 		 var form = document.createElement("form");
 	   /* form 요소에, 속성으로, 전달 방식 post, action : 전송 폼에서 submit 클릭시
@@ -80,6 +82,7 @@
 	     document.body.appendChild(form);
 	     /* 서버에 전달을 한다. action의 속성의 값의 위치로 이동 */
 	     form.submit();
+		  }
 	 
 	 }
 	 
