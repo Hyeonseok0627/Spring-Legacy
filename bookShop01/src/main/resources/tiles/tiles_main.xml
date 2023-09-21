@@ -23,7 +23,7 @@
 		<put-attribute name="body" value="/WEB-INF/views/main/main.jsp" />
 	</definition>
 	
-	<!-- "/" 로도 바로 접근이 가능하게 설정 -->
+	<!-- / 로도 바로 접근이 가능하게 설정 -->
 	<definition name="/" extends="baseLayout">
 		<put-attribute name="title" value="쇼핑몰 메인페이지" />
 		<put-attribute name="body" value="/WEB-INF/views/main.jsp" />

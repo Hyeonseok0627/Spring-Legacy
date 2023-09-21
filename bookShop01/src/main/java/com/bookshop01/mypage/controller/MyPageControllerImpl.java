@@ -38,7 +38,7 @@ public class MyPageControllerImpl extends BaseController  implements MyPageContr
 			   HttpServletRequest request, HttpServletResponse response)  throws Exception {
 		HttpSession session=request.getSession();
 		session=request.getSession();
-		session.setAttribute("side_menu", "my_page"); //¸¶ÀÌÆäÀÌÁö »çÀÌµå ¸Ş´º·Î ¼³Á¤ÇÑ´Ù.
+		session.setAttribute("side_menu", "my_page"); //ë§ˆì´í˜ì´ì§€ ì‚¬ì´ë“œ ë©”ë‰´ë¡œ ì„¤ì •í•œë‹¤.
 		
 		String viewName=(String)request.getAttribute("viewName");
 		ModelAndView mav = new ModelAndView(viewName);
@@ -88,7 +88,7 @@ public class MyPageControllerImpl extends BaseController  implements MyPageContr
 		dateMap.put("member_id", member_id);
 		List<OrderVO> myOrderHistList=myPageService.listMyOrderHistory(dateMap);
 		
-		String beginDate1[]=beginDate.split("-"); //°Ë»öÀÏÀÚ¸¦ ³â,¿ù,ÀÏ·Î ºĞ¸®ÇØ¼­ È­¸é¿¡ Àü´ŞÇÕ´Ï´Ù.
+		String beginDate1[]=beginDate.split("-"); //ê²€ìƒ‰ì¼ìë¥¼ ë…„,ì›”,ì¼ë¡œ ë¶„ë¦¬í•´ì„œ í™”ë©´ì— ì „ë‹¬í•©ë‹ˆë‹¤.
 		String endDate1[]=endDate.split("-");
 		mav.addObject("beginYear",beginDate1[0]);
 		mav.addObject("beginMonth",beginDate1[1]);
@@ -163,7 +163,7 @@ public class MyPageControllerImpl extends BaseController  implements MyPageContr
 		
 		memberMap.put("member_id", member_id);
 		
-		//¼öÁ¤µÈ È¸¿ø Á¤º¸¸¦ ´Ù½Ã ¼¼¼Ç¿¡ ÀúÀåÇÑ´Ù.
+		//ìˆ˜ì •ëœ íšŒì› ì •ë³´ë¥¼ ë‹¤ì‹œ ì„¸ì…˜ì— ì €ì¥í•œë‹¤.
 		memberVO=(MemberVO)myPageService.modifyMyInfo(memberMap);
 		session.removeAttribute("memberInfo");
 		session.setAttribute("memberInfo", memberVO);

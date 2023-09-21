@@ -37,9 +37,16 @@ public class AdminMemberControllerImpl extends BaseController  implements AdminM
 		String pageNum = dateMap.get("pageNum");
 		String beginDate=null,endDate=null;
 		
+		// 여기에 날짜가 null 이면 자동으로 생성해줌
 		String [] tempDate=calcSearchPeriod(fixedSearchPeriod).split(",");
 		beginDate=tempDate[0];
 		endDate=tempDate[1];
+	
+		
+		System.out.println("calcSearchPeriod 후 beginDate : "+ beginDate);
+		System.out.println("calcSearchPeriod 후  endDate : "+ endDate);
+		
+		
 		dateMap.put("beginDate", beginDate);
 		dateMap.put("endDate", endDate);
 		
@@ -53,9 +60,17 @@ public class AdminMemberControllerImpl extends BaseController  implements AdminM
 			pageNum = "1";
 		}
 		condMap.put("pageNum",pageNum);
+		// 추가. 
+		condMap.put("section",section);
 		condMap.put("beginDate",beginDate);
 		condMap.put("endDate", endDate);
+		System.out.println("beginDate : "+ beginDate);
+		System.out.println("endDate : "+ endDate);
+		System.out.println("section : "+ section);
+		System.out.println("pageNum : "+ pageNum);
+		// 동네2 , 외주. 
 		ArrayList<MemberVO> member_list=adminMemberService.listMember(condMap);
+		
 		mav.addObject("member_list", member_list);
 		
 		String beginDate1[]=beginDate.split("-");

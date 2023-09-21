@@ -28,7 +28,9 @@ public class MainController extends BaseController {
 	public ModelAndView main(HttpServletRequest request, HttpServletResponse response) throws Exception{
 		HttpSession session;
 		ModelAndView mav=new ModelAndView();
+		
 		String viewName=(String)request.getAttribute("viewName");
+		System.out.println("viewName 컨트롤러 도달 전 뷰이름 가져오기 : " +viewName );
 		mav.setViewName(viewName);
 		
 		session=request.getSession();

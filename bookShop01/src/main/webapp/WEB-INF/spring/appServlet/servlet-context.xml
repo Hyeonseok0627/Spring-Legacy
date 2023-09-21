@@ -31,9 +31,9 @@
 	
 	<mvc:interceptors>
   <mvc:interceptor>
-  	<mvc:mapping path="/"/>
-  	<mvc:mapping path="/*.do"/>
-    <mvc:mapping path="/*/*.do"/>
+  <mvc:mapping path="/"/> 
+  <mvc:mapping path="/*.do"/> 
+    <mvc:mapping path="/*/*.do"/> 
     <mvc:mapping path="/*/*/*.do"/> 
       <beans:bean class="com.bookshop01.common.interceptor.ViewNameInterceptor" />
   </mvc:interceptor>

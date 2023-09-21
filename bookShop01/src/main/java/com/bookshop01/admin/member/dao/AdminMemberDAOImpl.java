@@ -17,6 +17,8 @@ public class AdminMemberDAOImpl  implements AdminMemberDAO{
 	
 	
 	public ArrayList<MemberVO> listMember(HashMap condMap) throws DataAccessException{
+		String section = (String)condMap.get("section");
+		System.out.println("section : " + section);
 		ArrayList<MemberVO>  memberList=(ArrayList)sqlSession.selectList("mapper.admin.member.listMember",condMap);
 		return memberList;
 	}
